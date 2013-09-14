@@ -1,7 +1,7 @@
 Machine-Learning
 ================
 
-Assignments from NYU Course 480 - Machine Learning,
+Assignments from NYU Course 480 - Machine Learning
 
 - Problem Set 1 (Assignment 1)
 

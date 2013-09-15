@@ -222,8 +222,9 @@ def perceptron_train(data):
 				hi = 0
 			else: # if not then update using w = w + y(i) * f(x)
 				# print "update" # we have to update each weight of each word according to the equation
-				updateWeightSet(y, inOrNot, word_set)
-				# update it here (not done yet)
+				
+				mistakes += 1 # global mistakes
+				errorCounter += 1 # local counter
 			dataPoint += 1 # counter for internal functions
 		# if the errorCounter is 0 or more than 15 iterations have been done, then break out of the while loop
 		if errorCounter == 0 or iterations >= 15:

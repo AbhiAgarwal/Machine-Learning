@@ -10,9 +10,9 @@ weight_vector = [] # weight vector
 
 # Calling the information from the files
 def getData():
-	global training_data
-	global validation_data
-	global test_data
+	global training_data # Edit the global varabile
+	global validation_data # Edit the global varabile
+	global test_data # Edit the global varabile
 	# Declaration of files
 	train = open('./data/spam_train.txt', 'r')
 	test = open('./data/spam_test.txt', 'r')
@@ -34,7 +34,7 @@ def getData():
 
 # Getting word list out of the arrays
 def rankWords():
-	global vocabulary_list
+	global vocabulary_list # Edit the global varabile
 	vocabulary_list_before = {}
 	n = 0
 	# goes through the first 4000 words
@@ -93,7 +93,7 @@ def dotProduct(values, weight):
 # Copies the vocabulary list and sets it as the weight vector
 # and sets each weight to 0
 def copyAsWeightVector():
-	global weight_vector
+	global weight_vector # Edit the global varabile
 	weight = list(training_data)
 	counter = 0
 	for i in weight:
@@ -124,7 +124,7 @@ def makeWeightSet(thisset):
 # where the ith entry, xi, is 1 if the ith vector in the vocabulary
 # occurs in the email, and 0 otherwise."
 def featureWord(email_list):
-	global feature_list
+	global feature_list # Edit the global varabile
 	for i in range(0, 4000): # Doing this for EACH email
 		word_set = getSingleDataSet(email_list[i])
 		feature_list.append([])

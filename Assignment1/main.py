@@ -1,6 +1,6 @@
-import copy
-from numpy import dot
-import time
+import copy # copying dict/array function
+from numpy import dot # dot function
+import time # time (to measure)
 
 training_data = [] # data to train the program
 validation_data = [] # data to validate the training
@@ -8,22 +8,7 @@ test_data = [] # data to test the whole program
 
 vocabulary_list = {} # vocabulary/word list
 all_word_List = {} # list of all words
-
 feature_list = [] # email feature list
-weight_vector = [] # weight vector
-
-timeStart = 0
-timeEnd = 0
-
-def startTime():
-	global timeStart
-	timeStart = time.time()
-
-def endTime(function_name):
-	global timeStart
-	global timeEnd
-	timeEnd = time.time()
-	print function_name, (timeEnd - timeStart)
 
 # Calling the information from the files
 # Gets the training, validation, and test data
@@ -88,14 +73,14 @@ def rankWords():
 # helps to resolve that very easily, and removing the 1
 # and 0 so they don't come into the calculation for ranking.
 def getSingleDataSet(data):
-	data_set = data.split()
-	counter = 0
-	for data in data_set:
-		if data == '1':
+	data_set = data.split() # splits the giant array/dict
+	counter = 0 # sets counter to 0
+	for data in data_set: # goes through the data set 
+		if data == '1': # deletes 1
 			del data_set[counter]
-		elif data == '0':
+		elif data == '0': # deletes 0
 			del data_set[counter]
-		counter += 1
+		counter += 1 # increases counter
 	return data_set
 
 # Sorts words into order (if required)
@@ -109,32 +94,28 @@ def sortWords():
 # Returns 1 if Spam
 # Returns 0 if Not Spam
 def spamornot(word_list, number):
-	toBeDetermined = word_list[number]
-	if toBeDetermined[:2].replace(" ", "") == "1":
-		return 1
+	toBeDetermined = word_list[number] # checks the word to be determined
+	if toBeDetermined[:2].replace(" ", "") == "1": # checks if the first "x " is 1 or 0
+		return 1 # returns 1 if spam
 	elif toBeDetermined[:2].replace(" ", "") == "0":
-		return 0
+		return 0 # returns 0 if not spam
 
 # Dot Product of Feature Vector and Weight Vector
 # Takes in value, and weight and returns the dot product
 # of the words
 def dotProduct(values, weight):
-	weight_values = []
-	for i in weight:
-		weight_values.append(i[0])
-	return dot(weight_values, values)
+	weight_values = [] # creates a set of values
+	for i in weight: # goes through all the values
+		weight_values.append(i[0]) # puts the "values" set into correct order
+	return dot(weight_values, values) # returns the dot product of them
 
 # Copies the vocabulary list and sets it as the weight vector
 # and sets each weight to 0
 # Required as we need to adjust and get the weight of each word
 def copyAsWeightVector():
-	global weight_vector # Edit the global variable
-	weight = list(all_word_List)
-	counter = 0
-	for i in weight:
-		weight[counter] = 0
-		counter += 1
-	weight_vector = list(weight)
+	global all_word_List # Edit the global variable
+	for i in all_word_List:
+		all_word_List[i] = 0
 
 # Finding position of a particular word in the Weight Vector
 # We need to find the word in the weight vector so this would
@@ -156,11 +137,9 @@ def findPositionInWeight(word):
 def makeWeightSet(thisset):
 	weight_set = [] # instance of an empty array
 	singleSet = getSingleDataSet(thisset) # find the Single Set
-	count = 0 # Counter
 	for i in singleSet: # Go through the set of Single words
-		thisVector = weight_vector[count] # traverse through the word set
+		thisVector = all_word_List[i] # traverse through the word set
 		weight_set.append(thisVector) # appends it to the end of the set
-		count += 1 # increases counter by one
 	return weight_set
 
 # "For each email, transform it into a feature vector x
@@ -190,9 +169,7 @@ def featureWord(email_list):
 def updateWeightSet(yFunction, inOrNot, word_set):
 	count = 0
 	for loop in word_set:
-		positionOfWordInWeightVector = all_word_List.keys().index(loop) # Position of word in Vector
-		currentWeightVector = weight_vector[positionOfWordInWeightVector] # the current weight vector
-		weight_vector[positionOfWordInWeightVector] += (yFunction * inOrNot[count])
+		all_word_List[loop] += (yFunction * inOrNot[count])	
 		count += 1
 	count = 0
 
@@ -228,11 +205,14 @@ def perceptron_train(data):
 				mistakes += 1 # global mistakes
 				errorCounter += 1 # local counter
 			dataPoint += 1 # counter for internal functions
-		if errorCounter == 0 or iterations >= 15: # if the errorCounter is 0 or more than 15 iterations have been done,
+		end232 = time.time()
+		if errorCounter == 0 or iterations >= 2: # if the errorCounter is 0 or more than 15 iterations have been done,
 			break # then break out of the while loop
 		else: # or add one iteration
 			iterations += 1
 			dataPoint = 0 # set dataPoint (index) back to zero
+			print all_word_List
+			break
 	return
 
 def perceptron_test(w, data):

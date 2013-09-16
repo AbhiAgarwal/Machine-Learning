@@ -5,8 +5,10 @@ import time
 training_data = [] # data to train the program
 validation_data = [] # data to validate the training
 test_data = [] # data to test the whole program
+
 vocabulary_list = {} # vocabulary/word list
 all_word_List = {} # list of all words
+
 feature_list = [] # email feature list
 weight_vector = [] # weight vector
 
@@ -152,13 +154,13 @@ def findPositionInWeight(word):
 # and returns that set, you've to traverse through it
 # in order to get the set of all the words
 def makeWeightSet(thisset):
-	weight_set = []
-	singleSet = getSingleDataSet(thisset)
-	count = 0
-	for i in singleSet:
-		thisVector = weight_vector[count]
-		weight_set.append(thisVector)
-		count += 1
+	weight_set = [] # instance of an empty array
+	singleSet = getSingleDataSet(thisset) # find the Single Set
+	count = 0 # Counter
+	for i in singleSet: # Go through the set of Single words
+		thisVector = weight_vector[count] # traverse through the word set
+		weight_set.append(thisVector) # appends it to the end of the set
+		count += 1 # increases counter by one
 	return weight_set
 
 # "For each email, transform it into a feature vector x
@@ -167,22 +169,24 @@ def makeWeightSet(thisset):
 def featureWord(email_list):
 	global feature_list # Edit the global varabile
 	for i in range(0, 4000): # Doing this for EACH email
-		word_set = getSingleDataSet(email_list[i])
-		feature_list.append([])
-		count = 0
-		for word in word_set:
-			if word in vocabulary_list:
-				if word is not 0 and word is not 1:
-					feature_list[i].append(1)
+		word_set = getSingleDataSet(email_list[i]) # Get Single data set of the word_set
+		feature_list.append([]) # Adds one instance of a multidimensional array
+		count = 0 # set Counter to zero
+		for word in word_set: # traverse through each word
+			if word in vocabulary_list: # If the word is in the vocabulary list
+				if word is not 0 and word is not 1: # and the word is not '0' or '1'
+					feature_list[i].append(1) # then append '1' to the end of the Feature List
 					count += 1
 			else:
 				if word is not 0 and word is not 1:
-					feature_list[i].append(0)
+					feature_list[i].append(0) # else append '0' to the end of the Feature List
 					count += 1
 
 # Updates toe weight set according to the new w,
 # y, and set
 # MOST INEFFICIENT
+# 
+# THINK ABOUT: http://stackoverflow.com/questions/184643/what-is-the-best-way-to-copy-a-list-in-python
 def updateWeightSet(yFunction, inOrNot, word_set):
 	count = 0
 	for loop in word_set:
@@ -202,9 +206,8 @@ def perceptron_train(data):
 	dataPoint = 0 # What part of the data are we at
 	# traversal through the data
 	while True:
-		errorCounter = 0
-		for row in data:
-			# the word_set should be exactly mapped onto inOrNot
+		errorCounter = 0 # Counter for error in each iteration
+		for row in data: # the word_set should be exactly mapped onto inOrNot
 			word_set = getSingleDataSet(row) # The current set of words
 			inOrNot = feature_list[dataPoint] # If current word it is in the word_set
 			desiredOutput = spamornot(data, dataPoint) # 1 = Spam, 0 = Not Spam
@@ -221,17 +224,15 @@ def perceptron_train(data):
 			if y == desiredOutput:
 				hi = 0
 			else: # if not then update using w = w + y(i) * f(x)
-				# print "update" # we have to update each weight of each word according to the equation
-				
+				updateWeightSet(y, inOrNot, word_set)
 				mistakes += 1 # global mistakes
 				errorCounter += 1 # local counter
 			dataPoint += 1 # counter for internal functions
-		# if the errorCounter is 0 or more than 15 iterations have been done, then break out of the while loop
-		if errorCounter == 0 or iterations >= 15:
-			break
+		if errorCounter == 0 or iterations >= 15: # if the errorCounter is 0 or more than 15 iterations have been done,
+			break # then break out of the while loop
 		else: # or add one iteration
 			iterations += 1
-			print "iteration"
+			dataPoint = 0 # set dataPoint (index) back to zero
 	return
 
 def perceptron_test(w, data):
@@ -242,5 +243,8 @@ if __name__ == '__main__':
 	getData() # Gets data from the files
 	rankWords() # Ranks Words by how many times they appear
 	featureWord(training_data) # Transform into features, input vectors
-	copyAsWeightVector() # Copy training_data -> Weight Vector so they can be weighted
+	copyAsWeightVector() # Copy training_data -> Weight Vector so they can be weighte
+	start = time.time()
 	perceptron_train(training_data) # Runs main perceptron algorithm
+	end = time.time()
+	print (end - start)

@@ -1,3 +1,4 @@
+## Extra Functions
 # Checks if featureWord function is correct
 # and checks
 def checkAndSet(number):

@@ -1,0 +1,111 @@
+python main.py
+
+Running getData -> Gets data from the files
+Running rankWords -> Ranks word by appearences in data sample
+Running featureWord -> Creates the feature set
+
+Running perceptron_train() ->
+
+Mistakes of cycle: 1 mistakes: 694
+Mistakes of cycle: 2 mistakes: 415
+Mistakes of cycle: 3 mistakes: 312
+Mistakes of cycle: 4 mistakes: 317
+Mistakes of cycle: 5 mistakes: 249
+Mistakes of cycle: 6 mistakes: 247
+Mistakes of cycle: 7 mistakes: 240
+Mistakes of cycle: 8 mistakes: 161
+Mistakes of cycle: 9 mistakes: 182
+Mistakes of cycle: 10 mistakes: 118
+Mistakes of cycle: 11 mistakes: 158
+Mistakes of cycle: 12 mistakes: 165
+Mistakes of cycle: 13 mistakes: 118
+Mistakes of cycle: 14 mistakes: 97
+Mistakes of cycle: 14 mistakes: 30
+
+(Q4, Q3) Total Mistakes before algorithm ends: 3503
+(Q3) Number of passes through the data (Total Iterations): 15
+	 Time for Total Iterations: 21.4132831097s
+(Q4) The Validation Error is 38.6
+
+Running perceptron_test(validation_data) ->
+
+Mistakes of cycle: 1 mistakes: 686
+Mistakes of cycle: 2 mistakes: 438
+Mistakes of cycle: 3 mistakes: 59
+Mistakes of cycle: 4 mistakes: 40
+Mistakes of cycle: 5 mistakes: 34
+Mistakes of cycle: 6 mistakes: 33
+Mistakes of cycle: 7 mistakes: 30
+Mistakes of cycle: 8 mistakes: 34
+Mistakes of cycle: 9 mistakes: 30
+Mistakes of cycle: 10 mistakes: 28
+Mistakes of cycle: 11 mistakes: 27
+Mistakes of cycle: 12 mistakes: 25
+Mistakes of cycle: 13 mistakes: 27
+Mistakes of cycle: 14 mistakes: 22
+
+(Q4, Q3) Total Mistakes before algorithm ends: 1513
+(Q3) Number of passes through the data (Total Iterations): 15
+	 Time for Total Iterations: 5.47318220139
+(Q4) The Validation Error is 1.8
+
+Running weightAnalysis() ->
+
+(Q5) Words with the most positive weights
+
+1. Weight ('numberc', 1610)
+2. Weight ('your', 1213)
+3. Weight ('you', 1178)
+4. Weight ('dollarnumb', 818)
+5. Weight ('numberb', 763)
+6. Weight ('our', 730)
+7. Weight ('remov', 728)
+8. Weight ('order', 712)
+9. Weight ('of', 700)
+10. Weight ('report', 695)
+11. Weight ('email', 681)
+12. Weight ('pleas', 677)
+13. Weight ('monei', 609)
+14. Weight ('face', 607)
+15. Weight ('size', 605)
+
+(Q5) Words with the most negative weights
+
+1. Weight ('numberp', -928)
+2. Weight ('s', -784)
+3. Weight ('file', -728)
+4. Weight ('but', -704)
+5. Weight ('that', -676)
+6. Weight ('the', -621)
+7. Weight ('user', -585)
+8. Weight ('w', -579)
+9. Weight ('wrote', -559)
+10. Weight ('messag', -541)
+11. Weight ('d', -538)
+12. Weight ('re', -527)
+13. Weight ('date', -512)
+14. Weight ('subscript', -505)
+15. Weight ('a', -494)
+
+Running perceptron_test(test_data) ->
+
+Mistakes of cycle: 1 mistakes: 24
+Mistakes of cycle: 2 mistakes: 21
+Mistakes of cycle: 3 mistakes: 22
+Mistakes of cycle: 4 mistakes: 17
+Mistakes of cycle: 5 mistakes: 16
+Mistakes of cycle: 6 mistakes: 20
+Mistakes of cycle: 7 mistakes: 24
+Mistakes of cycle: 8 mistakes: 24
+Mistakes of cycle: 9 mistakes: 14
+Mistakes of cycle: 10 mistakes: 16
+Mistakes of cycle: 11 mistakes: 12
+Mistakes of cycle: 12 mistakes: 10
+Mistakes of cycle: 13 mistakes: 8
+Mistakes of cycle: 14 mistakes: 14
+
+(Q4, Q3) Total Mistakes before algorithm ends: 242
+(Q3) Number of passes through the data (Total Iterations): 15
+	 Time for Total Iterations: 6.02665686607s
+(Q6) Average Weight of all Vectors -14.3618395413
+(Q4) The Validation Error is 39.4

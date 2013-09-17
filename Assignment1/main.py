@@ -8,7 +8,8 @@ test_data = [] # data to test the whole program
 vocabulary_list = {} # vocabulary/word list
 weight_list = {} # weight vector
 feature_list = [] # email feature list
-feature_list_validation = []
+feature_list_validation = [] # validation set
+feature_list_test = []
 
 # Gets single data set from the given data
 # Usually require a split data set for all words
@@ -73,6 +74,7 @@ def rankWords():
 		if vocabulary_list_before[i] >= 30: # puts values of above 30 into the vocabulary list
 			vocabulary_list[i] = vocabulary_list_before[i]
 	copyAsWeightVector() # Copy training_data -> Weight Vector so they can be weighted
+	return
 
 # Copies the vocabulary list and sets it as the weight vector
 # and sets each weight to 0
@@ -81,6 +83,7 @@ def copyAsWeightVector():
 	global weight_list # Edit the global variable
 	for i in weight_list:
 		weight_list[i] = 0
+	return
 
 def rankWordsValidationSet():
 	global vocabulary_list # Edit the global varabile
@@ -106,6 +109,7 @@ def rankWordsValidationSet():
 			else:
 				vocabulary_list[i] = vocabulary_list_before[i]
 	copyAsWeightVectorValidation() # Copy training_data -> Weight Vector so they can be weighted
+	return
 
 # Copies the vocabulary list and sets it as the weight vector
 # and sets each weight to 0
@@ -115,6 +119,32 @@ def copyAsWeightVectorValidation():
 	global weight_list # Edit the global variable
 	for i in range(3999, 5000):
 		weight_list[i] = 0
+	return
+
+def rankWordsTestSet():
+	global vocabulary_list # Edit the global varabile
+	global weight_list # weight vector
+	vocabulary_list_before = {} # before you do < 30 choosings
+	for i in range(0, 1000): # goes through the first 4000 words
+		# splits the word set of the training data
+		word_set = getSingleDataSet(test_data[i])
+		for word in word_set:
+			if word in vocabulary_list_before:
+				# adds if the word is there
+				vocabulary_list_before[word] += 1
+			else:
+				vocabulary_list_before[word] = 1 # if it hasn't been created	
+	for i in vocabulary_list_before: # goes through all words above 30 appearances or more
+		if i in weight_list:
+			weight_list[i] += vocabulary_list_before[i]
+		else:
+			weight_list[i] = vocabulary_list_before[i]
+		if vocabulary_list_before[i] >= 30: # puts values of above 30 into the vocabulary list
+			if i in vocabulary_list:
+				vocabulary_list[i] += vocabulary_list_before[i]
+			else:
+				vocabulary_list[i] = vocabulary_list_before[i]
+	return
 
 # Determining if the current emails is spam or not
 # Just checks the first two characters of the particular email
@@ -140,6 +170,7 @@ def featureWord(email_list):
 				feature_list[i].append(1) # then append '1' to the end of the Feature List
 			else:
 				feature_list[i].append(0) # else append '0' to the end of the Feature List
+	return
 
 def featureWordValidation(email_list):
 	global feature_list_validation # Edit the global varabile
@@ -151,6 +182,19 @@ def featureWordValidation(email_list):
 				feature_list_validation[i].append(1) # then append '1' to the end of the Feature List
 			else:
 				feature_list_validation[i].append(0) # else append '0' to the end of the Feature List
+	return
+
+def featureWordTest(email_list):
+	global feature_list_test # Edit the global varabile
+	for i in range(0, 1000): # Doing this for EACH email
+		word_set = getSingleDataSet(email_list[i]) # Get Single data set of the word_set
+		feature_list_test.append([]) # Adds one instance of a multidimensional array
+		for word in word_set: # traverse through each word
+			if word in vocabulary_list: # If the word is in the vocabulary list
+				feature_list_test[i].append(1) # then append '1' to the end of the Feature List
+			else:
+				feature_list_test[i].append(0) # else append '0' to the end of the Feature List
+	return
 
 # Updates toe weight set according to the new w,
 # y, and set
@@ -159,12 +203,13 @@ def updateWeightSet(yFunction, inOrNot, word_set):
 	for loop in word_set: # goes through the word_set
 		weight_list[loop] += (yFunction * inOrNot[count]) # updates the weight according to the function	
 		count += 1 # increase the counter by one
+	return
 
 # Trains a perceptron classifier using the examples
 # provided to the function.
 # Returns: Final classification vector, number of updates (mistakes)
 # and number of passes through the data (iterations)
-def perceptron_train(data, feature, avg):
+def perceptron_train(data, feature, avg, max_iterations):
 	start = time.time()
 	iterations = 0 # Number of passes through data
 	totalmistakes = 0 # Number of mistakes/updates performed
@@ -172,7 +217,7 @@ def perceptron_train(data, feature, avg):
 	averageCalculator = 0
 	totalWeights = 0
 	# traversal through the data
-	while True:
+	while True and (iterations != max_iterations):
 		errorCounter = 0 # Counter for error in each iteration
 		for row in data: # the word_set should be exactly mapped onto inOrNot
 			word_set = getSingleDataSet(row) # The current set of words
@@ -194,28 +239,31 @@ def perceptron_train(data, feature, avg):
 				errorCounter += 1 # local counter
 			dataPoint += 1 # counter for internal functions
 		print "Mistakes of cycle:", (iterations + 1), "mistakes:", errorCounter # print out mistakes per cycle
-		if errorCounter == 0 or iterations >= 15: # if the errorCounter is 0 or more than 15 iterations have been done,
+		if errorCounter == 0 or iterations >= max_iterations: # if the errorCounter is 0 or more than 15 iterations have been done,
 			break # then break out of the while loop
 		else: # or add one iteration
 			iterations += 1
 			dataPoint = 0 # set dataPoint (index) back to zero
 			errorCounter = 0
-	print "Total Mistakes:", totalmistakes # print out total mistakes
-	print "Total Iterations:", (iterations + 1) # print out iterations at the end
+	print "(Q4, Q3) Total Mistakes before algorithm ends:", totalmistakes # print out total mistakes
+	print "(Q3) Number of passes through the data (Total Iterations):", (iterations + 1) # print out iterations at the end
 	end = time.time() # Time Iterations
 	print "Time for Total Iterations:", (end - start)
 	if avg:
 		averageC = (averageCalculator * 1.0) / (totalWeights * 1.0)
-		print "Average Weight of all Vectors", averageC
+		print "(Q6) Average Weight of all Vectors", averageC
 	return
 
-def perceptron_test(weight, data):
+# Test to check the Perceptron Algorithm. It uses the validation_data 
+# and finds how many errors it has. Then it divides the total with the
+# errors and gives a percentage of error.
+def perceptron_test(weight, data, feature_set):
 	errorCounter = 0 # Errored Operations
 	testCount = 0 # Total operations
 	dataPoint = 0 # What part of the data are we at
 	for row in data:
 		word_set = getSingleDataSet(row)
-		inOrNot = feature_list_validation[dataPoint]
+		inOrNot = feature_set[dataPoint]
 		desiredOutput = spamornot(data, dataPoint)
 		weight_set = [] # set of all weights for the current row
 		for words in word_set: # Traversal through the words to check the weight
@@ -228,13 +276,16 @@ def perceptron_test(weight, data):
 		testCount += 1 # increase the test Count by one
 		dataPoint += 1 # increase the data point by one - where we are in the data
 	errorTotal = ((errorCounter * 1.0) / (testCount * 1.0)) # calculates the error
-	print "The error is", (errorTotal * 100) # prints it as a percentage
+	print "(Q4) The Validation Error is", (errorTotal * 100) # prints it as a percentage
 	return
 
+# Finds the most positive and most negative weight of the data. 
+# It goes through the weights and sorts them, and then prints the first
+# fifteen most positive and the fifteen most negative.
 def weightAnalysis(weight):
 	weight_analysis = weight.copy() # sorts the analysis
 	weight_sorted = sorted(weight_analysis.iteritems(), key=lambda item: -item[1])
-	print "Highest" # prints highest values of weights
+	print "(Q5) Words with the most positive weights" # prints highest values of weights
 	print "1. Weight", weight_sorted[0]
 	print "2. Weight", weight_sorted[1]
 	print "3. Weight", weight_sorted[2]
@@ -250,7 +301,7 @@ def weightAnalysis(weight):
 	print "13. Weight", weight_sorted[12]
 	print "14. Weight", weight_sorted[13]
 	print "15. Weight", weight_sorted[14]
-	print "Lowest" # prings the lowest value of weights
+	print "(Q5) Words with the most negative weights" # prings the lowest value of weights
 	lowest = weight_sorted.__len__()
 	print "1. Weight", weight_sorted[lowest - 1]
 	print "2. Weight", weight_sorted[lowest - 2]
@@ -267,19 +318,21 @@ def weightAnalysis(weight):
 	print "13. Weight", weight_sorted[lowest - 13]
 	print "14. Weight", weight_sorted[lowest - 14]
 	print "15. Weight", weight_sorted[lowest - 15]
-
-
+	return
 
 # The main running function
 if __name__ == '__main__':
 	getData() # Gets data from the files
 	rankWords() # Ranks Words by how many times they appear
 	featureWord(training_data) # Transform into features, input vectors
-	perceptron_train(training_data, feature_list, False) # Runs main perceptron algorithm
+	perceptron_train(training_data, feature_list, False, 14) # Runs main perceptron algorithm
 	rankWordsValidationSet() # Puts words onto the vocabulary & weight set
 	featureWordValidation(validation_data) # Puts Feature onto Validation Set
-	perceptron_test(weight_list, validation_data) # Tests before doing training
-	perceptron_train(validation_data, feature_list_validation, False) # Trains for validation set
-	perceptron_test(weight_list, validation_data) # Tests again to see improvement
+	perceptron_test(weight_list, validation_data, feature_list_validation) # Tests before doing training
+	perceptron_train(validation_data, feature_list_validation, False, 14) # Trains for validation set
+	perceptron_test(weight_list, validation_data, feature_list_validation) # Tests again to see improvement
 	weightAnalysis(weight_list) # Analyising the weight both Low and High
-	perceptron_train(validation_data, feature_list_validation, True)
+	perceptron_train(validation_data, feature_list_validation, True, 14)
+	rankWordsTestSet()
+	featureWordTest(test_data)
+	perceptron_test(weight_list, test_data, feature_list_test) # Perceptron Test Algorithm

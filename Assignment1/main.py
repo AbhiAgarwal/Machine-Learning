@@ -326,13 +326,13 @@ if __name__ == '__main__':
 	rankWords() # Ranks Words by how many times they appear
 	featureWord(training_data) # Transform into features, input vectors
 	perceptron_train(training_data, feature_list, False, 14) # Runs main perceptron algorithm
-	rankWordsValidationSet() # Puts words onto the vocabulary & weight set
-	featureWordValidation(validation_data) # Puts Feature onto Validation Set
+	# rankWordsValidationSet() # Puts words onto the vocabulary & weight set
+	# featureWordValidation(validation_data) # Puts Feature onto Validation Set
 	perceptron_test(weight_list, validation_data, feature_list_validation) # Tests before doing training
 	perceptron_train(validation_data, feature_list_validation, False, 14) # Trains for validation set
 	perceptron_test(weight_list, validation_data, feature_list_validation) # Tests again to see improvement
 	weightAnalysis(weight_list) # Analyising the weight both Low and High
 	perceptron_train(validation_data, feature_list_validation, True, 14)
-	rankWordsTestSet()
-	featureWordTest(test_data)
-	perceptron_test(weight_list, test_data, feature_list_test) # Perceptron Test Algorithm
+	#rankWordsTestSet() - To understand the proper %
+	#featureWordTest(test_data) - To understand the proper %
+	perceptron_test(weight_list, test_data, feature_list_test) # Perceptron Test

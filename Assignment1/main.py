@@ -114,7 +114,6 @@ def rankWordsValidationSet():
 # Copies the vocabulary list and sets it as the weight vector
 # and sets each weight to 0
 # Required as we need to adjust and get the weight of each word
-
 def copyAsWeightVectorValidation():
 	global weight_list # Edit the global variable
 	for i in range(3999, 5000):

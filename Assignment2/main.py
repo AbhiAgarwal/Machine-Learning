@@ -77,11 +77,11 @@ def rankWords(data, dataset):
 # @Create feature set of email set (x with sub(i))
 # @Returns nothing
 def featureWord(email_list, dataset):
+	global feature_list # Edit the global varabile
 	print "		-> Creating Feature Set"
 	print "		-> Dataset: " + dataset
 	startTime = time.time() # Starts Timer
-	global feature_list # Edit the global varabile
-	for i in range(0, len(email_list)): # Doing this for EACH email
+	for i, email in enumerate(email_list): # Doing this for EACH email
 		word_set = getSingleDataSet(email_list[i]) # Get Single data set of the word_set
 		feature_list.append([]) # Adds one instance of a multidimensional array
 		for word in word_set: # traverse through each word
@@ -113,20 +113,28 @@ def createVector():
 	validate_vector_list = feature_list[4000:5000]
 
 def vectorAdd(vecOne, vecTwo):
+	if "-all" in sys.argv:
+		print "Calling vectorAdd"
 	vec = []
 	for one, two in zip(vecOne, vecTwo):
 		vec.append(one + two)
 	return vec
 
 def vectorMult(scalarQ, vecAr):
+	if "-all" in sys.argv:
+		print "Calling vectorMult"
 	for index, vector in enumerate(vecAr):
 		vecAr[index] *= scalarQ
 	return vecAr
 
 def dotFunction(vecOne, vecTwo):
+	if "-all" in sys.argv:
+		print "Calling dotFunction"
 	return sum(one * two for one, two in zip(vecOne, vecTwo))
 
 def vectorMagnitude(vector):
+	if "-all" in sys.argv:
+		print "Calling vectorMagnitude"
 	div = float(0)
 	for values in vector:
 		div += float(math.pow(values, 2))
@@ -134,6 +142,8 @@ def vectorMagnitude(vector):
 	return 0.001 if (div == 0.0) else magnitude
 
 def evaluateFunc(weight, lambd, two):
+	if "-all" in sys.argv:
+		print "Calling evaluateFunc"
 	obj = ((lambd / 2) * math.pow(vectorMagnitude(weight), 2)) + two
 	return obj
 
@@ -143,13 +153,11 @@ def pegasos_svm_train(vector, data, lambd, iteration):
 	global weights_pegasos
 	print "		-> Training using the Pegasos Algorithm"
 	startTime = time.time() # Starts Timer
-
 	iterations = 1 # Num of passes through data
 	weights_pegasos = [0 for i in range(0, len(vector))] # Initilize the Weight
 	u = [0 for i in range(0, len(vector))] # Initlize the "u"
 	t = 0 # Element value
 	nt = 0 # n subscript t value
-
 	for i in range(0, iteration): # 20 passes through data
 		loss = 0
 		overone = 0 # > 1
@@ -159,17 +167,16 @@ def pegasos_svm_train(vector, data, lambd, iteration):
 			t += 1
 			nt = ((float(1))/(t * lambd))
 			yj = 1 if (spamornot(data, index) == 1) else -1
-			weights_pegasos = [0 for i in range(0, len(vector))]
-			if(yj * dotFunction(weights_pegasos, vec) < 1):
+			if((yj * dotFunction(weights_pegasos, vec)) < 1):
 				u = vectorAdd(vectorMult((1 - (nt * lambd)), weights_pegasos), vectorMult((nt * yj), vec))
 				underone += 1
 			else:
-				u = vectorMult((1 - (np * lambd)), weights_pegasos)
+				u = vectorMult((1 - (nt * lambd)), weights_pegasos)
 				overone += 1
 			val = min(1, ((1 / (math.sqrt(lambd))) / (vectorMagnitude(u))))
 			tempo = vectorMult(val, u)
 			weights_pegasos = tempo[:]
-			evalution += max(0, 1 - (nt * dotFunction(weights_pegasos, vec)))
+			evalution += max(0, (1 - (nt * dotFunction(weights_pegasos, vec))))
 			del u[:] #reset
 		obj_val = evaluateFunc(weights_pegasos, lambd, evalution)
 		print "			-> Number: " + str(iterations) + " Value: " + str(obj_val)
@@ -177,9 +184,31 @@ def pegasos_svm_train(vector, data, lambd, iteration):
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
 	return weights_pegasos
 
+def checkValue(vector, weight):
+	if "-all" in sys.argv:
+		print "Calling checkValue"
+	result = 1 if (dotFunction(vector, weight) > 0) else -1
+	return result
+
 # @Tests the SVM Algorithm
 # @Returns nothing
-def pegasos_svm_test(data, w):
+def pegasos_svm_test(weight, feature, data):
+	print "		-> Starting Test"
+	print "		-> Dataset: " + "Test Data, using " + str(len(feature))
+	startTime = time.time() # Starts Timer
+	errors = 0
+
+	for index, vec in enumerate(feature):
+		yj = 1 if (spamornot(data, index) == 1) else -1
+		result = checkValue(vec, weight)
+		if result == yj:
+			continue
+		else:
+			errors += 1
+
+	notRight = (float(errors) / (float(len(feature))))
+	print "			-> Error: " + str(errors) + ", out of: " + str(len(feature)) + ". Has " + str(notRight) + "% errors"
+	print "			-> Took " + str(time.time() - startTime) + " seconds"	
 	return
 
 # @Main function
@@ -188,7 +217,6 @@ if __name__ == '__main__':
 	if "-run" in sys.argv:
 		print "Calling: " + str(sys.argv) + " arguments."
 		print "-> Starting Process"
-
 		# Initialize
 		startTime = time.time() # Starts Timer
 		getData() # Gets data from all the files
@@ -197,10 +225,10 @@ if __name__ == '__main__':
 		featureWord(training_data, "Training Data") # Transform into features, input vectors
 		featureWord(validation_data, "Validation Data") # Transform into features, input vectors
 		createVector()
-
 		# Run Pegasos
 		lambd = math.pow(2,-5)
-		pegasos_svm_train(train_vector_list, training_data, lambd, 10)
+		weight = pegasos_svm_train(train_vector_list, all_data, lambd, 20)
+		pegasos_svm_test(weight, validate_vector_list, validation_data)
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:
 		print "heh"

@@ -1,12 +1,14 @@
 from numpy import dot # Dot Function
-import math
-import time
+import math, time, sys
+all_data = []
 training_data = [] # Training Data
 validation_data = [] # Validation Data
 test_data = [] # Test Data
 weight_list = {} # Weight List
 feature_list = [] # Feature Set
 vocabulary_list = {} # vocabulary/word list
+train_vector_list = []
+validate_vector_list = []
 
 # @Gets data from train & test
 # @Returns nothing
@@ -18,6 +20,7 @@ def getData():
 	test = open('./data/spam_test.txt', 'r') # Declaration of files
 	for index, data in enumerate(train): # Getting data from the files
 		if data:
+			all_data.append(data)
 			if index < 4000: # Getting 0-3999 data to training set
 				training_data.append(data)
 			else: # Getting 4000-5000 data to validation set
@@ -26,11 +29,17 @@ def getData():
 		if testdata: # Getting 0-1000 data to test set
 			test_data.append(testdata) # put data into test_data array
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
+	print "			-> There are " + str(len(all_data)) + " words in all the Data Set"
+	print "			-> There are " + str(len(training_data)) + " words in the Training Data Set"
+	print "			-> There are " + str(len(validation_data)) + " words in the Validation Data Set"
+	print "			-> There are " + str(len(test_data)) + " words in the Test Data Set"
 	return
 
 # @Splits data into many words, and removes '0' or '1'
 # @Returns Split & Removed of '0', '1' Data Set
 def getSingleDataSet(data):
+	if "-all" in sys.argv:
+		print "Calling getSingleDataSet"
 	data_set = data.split() # splits the giant array/dict
 	for index, data in enumerate(data_set): # goes through the data set 
 		if data == '1': # deletes 1, cleanup
@@ -60,15 +69,16 @@ def rankWords():
 	for i in weight_list:
 		weight_list[i] = 0 # Initilizes it all to zero
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
+	print "			-> There are " + str(len(vocabulary_list)) + " words in the Vocabulary List"
 	return
 
 # @Create feature set of email set (x with sub(i))
 # @Returns nothing
-def featureWord(email_list):
-	print "		-> Creating Feature Set"
+def featureWord(email_list, dataset):
+	print "		-> Creating Feature Set for: " + dataset
 	startTime = time.time() # Starts Timer
 	global feature_list # Edit the global varabile
-	for i in range(0, 4000): # Doing this for EACH email
+	for i in range(0, len(email_list)): # Doing this for EACH email
 		word_set = getSingleDataSet(email_list[i]) # Get Single data set of the word_set
 		feature_list.append([]) # Adds one instance of a multidimensional array
 		for word in word_set: # traverse through each word
@@ -77,20 +87,31 @@ def featureWord(email_list):
 			else:
 				feature_list[i].append(0) # else append '0' to the end of the Feature List
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
+	print "			-> There are " + str(len(feature_list)) + " words in the feature list"
 	return
 
 # @Determines if it is spam or not
 # @Returns -1 or 1
 def spamornot(word_list, number):
+	if "-all" in sys.argv:
+		print "Calling spamornot"
 	toBeDetermined = word_list[number] # checks the word to be determined
 	if toBeDetermined[:2].replace(" ", "") == "1": # checks if the first "x " is 1 or 0
 		return 1 # returns 1 if spam
 	elif toBeDetermined[:2].replace(" ", "") == "0":
 		return 0 # returns 0 if not spam
 
+# Splits vector training, and validation into 4000:1000 split
+def createVector():
+	if "-all" in sys.argv:
+		print "Calling createVector"
+	global validate_vector_list, train_vector_list
+	train_vector_list = feature_list[0:4000]
+	validate_vector_list = feature_list[4000:5000]
+
 # @Trains using Support Vector Machine Algorithm
 # @Returns final classification vector
-def pegasos_svm_train(data, lambd):
+def pegasos_svm_train(vector, data, lambd):
 	global weight_list
 	print "		-> Training using the Pegasos Algorithm"
 	startTime = time.time() # Starts Timer
@@ -121,10 +142,21 @@ def pegasos_svm_test(data, w):
 # @Main function
 # @Returns nothing
 if __name__ == '__main__':
-	print "-> Starting Process"
-	startTime = time.time() # Starts Timer
-	getData() # Gets data from all the files
-	rankWords() # Ranks Words by how many times they appear
-	featureWord(training_data) # Transform into features, input vectors
-	lambd = math.pow(2,-5)
-	print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
+	if "-run" in sys.argv:
+		print "-> Starting Process"
+		startTime = time.time() # Starts Timer
+		getData() # Gets data from all the files
+		rankWords() # Ranks Words by how many times they appear
+		featureWord(training_data, "Training Data") # Transform into features, input vectors
+		featureWord(test_data, "Test Data") # Transform into features, input vectors
+		createVector()
+
+		lambd = math.pow(2,-5)
+		#pegasos_svm_train(train_vector_list, training_data, lambd)
+		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
+	elif "-test" in sys.argv:
+		print "heh"
+	else:
+		print "	-run: to run training"
+		print "	-test: to run testing"
+		print "	-all: to show all function"

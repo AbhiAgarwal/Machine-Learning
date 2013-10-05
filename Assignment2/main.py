@@ -159,14 +159,13 @@ def pegasos_svm_train(vector, data, lambd, iteration):
 	t = 0 # Element value
 	nt = 0 # n subscript t value
 	for i in range(0, iteration): # 20 passes through data
-		loss = 0
 		overone = 0 # > 1
 		underone = 0 # < 1
 		evalution = 0 # eval
 		for index, vec in enumerate(vector): # Traversal through the Feature List
 			t += 1
 			nt = ((float(1))/(t * lambd))
-			yj = 1 if (spamornot(data, index) == 1) else -1
+			yj = 1 if (spamornot(data, index) == 0) else -1
 			if((yj * dotFunction(weights_pegasos, vec)) < 1):
 				u = vectorAdd(vectorMult((1 - (nt * lambd)), weights_pegasos), vectorMult((nt * yj), vec))
 				underone += 1
@@ -179,6 +178,7 @@ def pegasos_svm_train(vector, data, lambd, iteration):
 			evalution += max(0, (1 - (nt * dotFunction(weights_pegasos, vec))))
 			del u[:] #reset
 		obj_val = evaluateFunc(weights_pegasos, lambd, evalution)
+		print "			-> Lower Than One: " + str(underone) + " Over One: " + str(overone)
 		print "			-> Number: " + str(iterations) + " Value: " + str(obj_val)
 		iterations += 1
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
@@ -199,7 +199,7 @@ def pegasos_svm_test(weight, feature, data):
 	errors = 0
 
 	for index, vec in enumerate(feature):
-		yj = 1 if (spamornot(data, index) == 1) else -1
+		yj = 1 if (spamornot(data, index) == 0) else -1
 		result = checkValue(vec, weight)
 		if result == yj:
 			continue

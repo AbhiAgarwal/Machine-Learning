@@ -1,15 +1,14 @@
-from numpy import dot # Dot Function
 import math, time, sys
-all_data = []
+all_data = [] # Training + Validation Data
 training_data = [] # Training Data
 validation_data = [] # Validation Data
 test_data = [] # Test Data
 weight_list = {} # Weight List
 feature_list = [] # Feature Set
 vocabulary_list = {} # vocabulary/word list
-train_vector_list = []
-validate_vector_list = []
-weights_pegasos = [] # THIS ONE WE USE
+train_vector_list = [] # Vector for Training
+validate_vector_list = [] # Vector for Validation
+weights_pegasos = [] # THIS ONE WE USE FOR PEGASOS WEIGHT 
 
 # @Gets data from train & test
 # @Returns nothing
@@ -65,6 +64,7 @@ def rankWords(data, dataset):
 			else:
 				vocabulary_list_before[word] = 1 # if it hasn't been created
 			weight_list = vocabulary_list_before # set one instance of the vocabulary list as the weight
+	print "		-> Removing words occuring less than 30 times"
 	for i in vocabulary_list_before: # goes through all words above 30 appearances or more
 		if vocabulary_list_before[i] >= 30: # puts values of above 30 into the vocabulary list
 			vocabulary_list[i] = vocabulary_list_before[i]
@@ -112,31 +112,70 @@ def createVector():
 	train_vector_list = feature_list[0:4000]
 	validate_vector_list = feature_list[4000:5000]
 
+def vectorAdd(vecOne, vecTwo):
+	vec = []
+	for one, two in zip(vecOne, vecTwo):
+		vec.append(one + two)
+	return vec
+
+def vectorMult(scalarQ, vecAr):
+	for index, vector in enumerate(vecAr):
+		vecAr[index] *= scalarQ
+	return vecAr
+
+def dotFunction(vecOne, vecTwo):
+	return sum(one * two for one, two in zip(vecOne, vecTwo))
+
+def vectorMagnitude(vector):
+	div = float(0)
+	for values in vector:
+		div += float(math.pow(values, 2))
+	magnitude = float(math.sqrt(div))
+	return 0.001 if (div == 0.0) else magnitude
+
+def evaluateFunc(weight, lambd, two):
+	obj = ((lambd / 2) * math.pow(vectorMagnitude(weight), 2)) + two
+	return obj
+
 # @Trains using Support Vector Machine Algorithm
 # @Returns final classification vector
-def pegasos_svm_train(vector, data, lambd):
+def pegasos_svm_train(vector, data, lambd, iteration):
 	global weights_pegasos
 	print "		-> Training using the Pegasos Algorithm"
 	startTime = time.time() # Starts Timer
 
-	weights_pegasos = [0 for i in range(0,len(vector))]
-	u = [0 for i in range(0, weight_list.__len__())]
-	iterations = 20 # Num of passes through data
+	iterations = 1 # Num of passes through data
+	weights_pegasos = [0 for i in range(0, len(vector))] # Initilize the Weight
+	u = [0 for i in range(0, len(vector))] # Initlize the "u"
 	t = 0 # Element value
 	nt = 0 # n subscript t value
 
-	for i in range(0, iterations): # 20 passes through data
+	for i in range(0, iteration): # 20 passes through data
 		loss = 0
-		for index, email in enumerate(feature_list): # Traversal through the Feature List
+		overone = 0 # > 1
+		underone = 0 # < 1
+		evalution = 0 # eval
+		for index, vec in enumerate(vector): # Traversal through the Feature List
 			t += 1
 			nt = ((float(1))/(t * lambd))
-			yj = 1 if (spamornot(data, index) == 0) else -1
-			if(yj * dot(email, weight_list)):
-				print "x"
-			#if (yj * dot(wt, xt) > 1):
-			#	u = (1 - (nt * lambd) * wt + nt*yj*xj )
+			yj = 1 if (spamornot(data, index) == 1) else -1
+			weights_pegasos = [0 for i in range(0, len(vector))]
+			if(yj * dotFunction(weights_pegasos, vec) < 1):
+				u = vectorAdd(vectorMult((1 - (nt * lambd)), weights_pegasos), vectorMult((nt * yj), vec))
+				underone += 1
+			else:
+				u = vectorMult((1 - (np * lambd)), weights_pegasos)
+				overone += 1
+			val = min(1, ((1 / (math.sqrt(lambd))) / (vectorMagnitude(u))))
+			tempo = vectorMult(val, u)
+			weights_pegasos = tempo[:]
+			evalution += max(0, 1 - (nt * dotFunction(weights_pegasos, vec)))
+			del u[:] #reset
+		obj_val = evaluateFunc(weights_pegasos, lambd, evalution)
+		print "			-> Number: " + str(iterations) + " Value: " + str(obj_val)
+		iterations += 1
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
-	return
+	return weights_pegasos
 
 # @Tests the SVM Algorithm
 # @Returns nothing
@@ -161,7 +200,7 @@ if __name__ == '__main__':
 
 		# Run Pegasos
 		lambd = math.pow(2,-5)
-		#pegasos_svm_train(train_vector_list, training_data, lambd)
+		pegasos_svm_train(train_vector_list, training_data, lambd, 10)
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:
 		print "heh"

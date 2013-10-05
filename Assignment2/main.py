@@ -9,6 +9,7 @@ feature_list = [] # Feature Set
 vocabulary_list = {} # vocabulary/word list
 train_vector_list = []
 validate_vector_list = []
+weights_pegasos = [] # THIS ONE WE USE
 
 # @Gets data from train & test
 # @Returns nothing
@@ -50,13 +51,14 @@ def getSingleDataSet(data):
 
 # @Gets list of words which occur 30 or more times
 # @Returns nothing
-def rankWords():
+def rankWords(data, dataset):
 	global vocabulary_list, weight_list
 	print "		-> Putting words into Vocabulary & Weight List"
+	print "		-> Dataset: " + dataset
 	startTime = time.time() # Starts Timer
 	vocabulary_list_before = {} # before you do < 30 choosings
-	for i in range(0, 4000): # goes through the first 4000 words
-		word_set = getSingleDataSet(training_data[i]) # splits
+	for i in range(0, len(data)): # goes through the first 4000 words
+		word_set = getSingleDataSet(data[i]) # splits
 		for word in word_set:
 			if word in vocabulary_list_before:
 				vocabulary_list_before[word] += 1 # adds if the word is there
@@ -75,7 +77,8 @@ def rankWords():
 # @Create feature set of email set (x with sub(i))
 # @Returns nothing
 def featureWord(email_list, dataset):
-	print "		-> Creating Feature Set for: " + dataset
+	print "		-> Creating Feature Set"
+	print "		-> Dataset: " + dataset
 	startTime = time.time() # Starts Timer
 	global feature_list # Edit the global varabile
 	for i in range(0, len(email_list)): # Doing this for EACH email
@@ -112,10 +115,11 @@ def createVector():
 # @Trains using Support Vector Machine Algorithm
 # @Returns final classification vector
 def pegasos_svm_train(vector, data, lambd):
-	global weight_list
+	global weights_pegasos
 	print "		-> Training using the Pegasos Algorithm"
 	startTime = time.time() # Starts Timer
 
+	weights_pegasos = [0 for i in range(0,len(vector))]
 	u = [0 for i in range(0, weight_list.__len__())]
 	iterations = 20 # Num of passes through data
 	t = 0 # Element value
@@ -143,14 +147,19 @@ def pegasos_svm_test(data, w):
 # @Returns nothing
 if __name__ == '__main__':
 	if "-run" in sys.argv:
+		print "Calling: " + str(sys.argv) + " arguments."
 		print "-> Starting Process"
+
+		# Initialize
 		startTime = time.time() # Starts Timer
 		getData() # Gets data from all the files
-		rankWords() # Ranks Words by how many times they appear
+		rankWords(training_data, "Training Data") # Ranks Words by how many times they appear
+		rankWords(validation_data, "Validation Data") # Ranks Words by how many times they appear
 		featureWord(training_data, "Training Data") # Transform into features, input vectors
-		featureWord(test_data, "Test Data") # Transform into features, input vectors
+		featureWord(validation_data, "Validation Data") # Transform into features, input vectors
 		createVector()
 
+		# Run Pegasos
 		lambd = math.pow(2,-5)
 		#pegasos_svm_train(train_vector_list, training_data, lambd)
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"

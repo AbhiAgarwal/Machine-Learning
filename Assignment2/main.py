@@ -197,7 +197,6 @@ def pegasos_svm_test(weight, feature, data):
 	print "		-> Dataset: " + "Test Data, using " + str(len(feature))
 	startTime = time.time() # Starts Timer
 	errors = 0
-
 	for index, vec in enumerate(feature):
 		yj = 1 if (spamornot(data, index) == 0) else -1
 		result = checkValue(vec, weight)
@@ -205,7 +204,6 @@ def pegasos_svm_test(weight, feature, data):
 			continue
 		else:
 			errors += 1
-
 	notRight = (float(errors) / (float(len(feature))))
 	print "			-> Error: " + str(errors) + ", out of: " + str(len(feature)) + ". Has " + str(notRight) + "% errors"
 	print "			-> Took " + str(time.time() - startTime) + " seconds"	

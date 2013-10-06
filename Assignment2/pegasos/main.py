@@ -1,6 +1,4 @@
 import math, time, sys
-import itertools
-import cPickle
 all_data = [] # Training + Validation Data
 training_data = [] # Training Data
 validation_data = [] # Validation Data

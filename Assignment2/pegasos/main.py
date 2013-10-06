@@ -104,7 +104,6 @@ def featureWord(email_list, dataset):
 	print "		-> Creating Feature Set"
 	print "		-> Dataset: " + dataset
 	startTime = time.time() # Starts Timer
-	feature_list = [[0 for x in range(len(vocabulary_list))] for y in range(4000)]
 	statement = True
 	counter = 0
 	while (counter < len(email_list)):
@@ -114,6 +113,7 @@ def featureWord(email_list, dataset):
 				keys = index_vocab.index(word)
 				feature_list[counter][keys] = 1
 		counter += 1
+		print counter
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
 	print "			-> There are " + str(len(feature_list)) + " words in the feature list, and " + str(len(feature_list[1])) + " elements in each."
 	return
@@ -245,11 +245,11 @@ if __name__ == '__main__':
 		getData() # Gets data from all the files
 		rankWords(training_data, "Training Data") # Ranks Words by how many times they appear
 		rankWords(validation_data, "Validation Data") # Ranks Words by how many times they appear
-		featureWord(training_data, "Training Data") # Transform into features, input vectors
-		featureWord(validation_data, "Validation Data") # Transform into features, input vectors
+		feature_list = [[0 for x in range(len(vocabulary_list))] for y in range(5000)]
+		featureWord(all_data, "Training & Validation Data") # Transform into features, input vectors
 		createVector()
 		# Run Pegasos
-		lambd = math.pow(2,-5)
+		lambd = math.pow(2, -5)
 		weight = pegasos_svm_train(train_vector_list, all_data, lambd, 1)
 		pegasos_svm_test(weight, validate_vector_list, validation_data)
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"

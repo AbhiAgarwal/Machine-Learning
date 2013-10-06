@@ -9,4 +9,6 @@ Assignments from NYU Course 480 - Machine Learning
 
 - Problem Set 2 (Assignment 2)
 
-    Implementing Support Vector Machines, specifically the Pegasos Algorithm, and the Pegasos Algorithm for multiple-classes.
+    Implementing Support Vector Machines, specifically:
+        - the Pegasos Algorithm,
+        - the Pegasos Algorithm for multiple-classes

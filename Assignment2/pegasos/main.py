@@ -233,7 +233,11 @@ if __name__ == '__main__':
 		if "-lambd" in sys.argv:
 			key = sys.argv.index('-lambd') + 1
 			lambd = int(math.pow(2, float(sys.argv[key])))
-		weight = pegasos_svm_train(train_vector_list, all_data, lambd, 1)
+		iteration = 5
+		if "-iteration" in sys.argv:
+			key = sys.argv.index('-iteration') + 1
+			iteration = int(float(sys.argv[key]))
+		weight = pegasos_svm_train(train_vector_list, all_data, lambd, iteration)
 		pegasos_svm_test(weight, validate_vector_list, validation_data)
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:
@@ -243,3 +247,4 @@ if __name__ == '__main__':
 		print "	-test: to run testing"
 		print "	-all: to show all function"
 		print " -lambd: to input lambda (default: -5)"
+		print " -iteration: to input iterations to make (default: 5)"

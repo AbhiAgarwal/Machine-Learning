@@ -1,4 +1,6 @@
 import math, time, sys
+import itertools
+import cPickle
 all_data = [] # Training + Validation Data
 training_data = [] # Training Data
 validation_data = [] # Validation Data
@@ -76,25 +78,6 @@ def rankWords(data, dataset):
 	print "			-> There are " + str(len(vocabulary_list)) + " words in the Vocabulary List"
 	return
 
-# @Create feature set of email set (x with sub(i))
-# @Returns nothing
-def oldfeatureWord(email_list, dataset):
-	global feature_list # Edit the global varabile
-	print "		-> Creating Feature Set"
-	print "		-> Dataset: " + dataset
-	startTime = time.time() # Starts Timer
-	for i, email in enumerate(email_list): # Doing this for EACH email
-		word_set = getSingleDataSet(email_list[i]) # Get Single data set of the word_set
-		feature_list.append([]) # Adds one instance of a multidimensional array
-		for word in word_set: # traverse through each word
-			if word in vocabulary_list: # If the word is in the vocabulary list
-				feature_list[i].append(1) # then append '1' to the end of the Feature List
-			else:
-				feature_list[i].append(0) # else append '0' to the end of the Feature List
-	print "			-> Took " + str(time.time() - startTime) + " seconds"
-	print "			-> There are " + str(len(feature_list)) + " words in the feature list"
-	return
-
 # You've to go through all the vocab and tick 1 or 0 if its there
 # UPDATE: TOO SLOW
 # @Returns nothing
@@ -104,7 +87,6 @@ def featureWord(email_list, dataset):
 	print "		-> Creating Feature Set"
 	print "		-> Dataset: " + dataset
 	startTime = time.time() # Starts Timer
-	statement = True
 	counter = 0
 	while (counter < len(email_list)):
 		word_set = getSingleDataSet(email_list[counter])
@@ -250,6 +232,9 @@ if __name__ == '__main__':
 		createVector()
 		# Run Pegasos
 		lambd = math.pow(2, -5)
+		if "-lambd" in sys.argv:
+			key = sys.argv.index('-lambd') + 1
+			lambd = int(math.pow(2, float(sys.argv[key])))
 		weight = pegasos_svm_train(train_vector_list, all_data, lambd, 1)
 		pegasos_svm_test(weight, validate_vector_list, validation_data)
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
@@ -259,3 +244,4 @@ if __name__ == '__main__':
 		print "	-run: to run training"
 		print "	-test: to run testing"
 		print "	-all: to show all function"
+		print " -lambd: to input lambda (default: -5)"

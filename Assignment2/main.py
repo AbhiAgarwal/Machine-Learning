@@ -9,6 +9,7 @@ vocabulary_list = {} # vocabulary/word list
 train_vector_list = [] # Vector for Training
 validate_vector_list = [] # Vector for Validation
 weights_pegasos = [] # THIS ONE WE USE FOR PEGASOS WEIGHT 
+index_vocab = []
 
 # @Gets data from train & test
 # @Returns nothing
@@ -63,11 +64,12 @@ def rankWords(data, dataset):
 				vocabulary_list_before[word] += 1 # adds if the word is there
 			else:
 				vocabulary_list_before[word] = 1 # if it hasn't been created
-			weight_list = vocabulary_list_before # set one instance of the vocabulary list as the weight
+		weight_list = vocabulary_list_before # set one instance of the vocabulary list as the weight
 	print "		-> Removing words occuring less than 30 times"
 	for i in vocabulary_list_before: # goes through all words above 30 appearances or more
 		if vocabulary_list_before[i] >= 30: # puts values of above 30 into the vocabulary list
 			vocabulary_list[i] = vocabulary_list_before[i]
+	index_vocab = vocabulary_list.keys()
 	for i in weight_list:
 		weight_list[i] = 0 # Initilizes it all to zero
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
@@ -76,7 +78,7 @@ def rankWords(data, dataset):
 
 # @Create feature set of email set (x with sub(i))
 # @Returns nothing
-def checkFeature(email_list, dataset):
+def oldfeatureWord(email_list, dataset):
 	global feature_list # Edit the global varabile
 	print "		-> Creating Feature Set"
 	print "		-> Dataset: " + dataset
@@ -94,19 +96,24 @@ def checkFeature(email_list, dataset):
 	return
 
 # You've to go through all the vocab and tick 1 or 0 if its there
-
+# UPDATE: TOO SLOW
+# @Returns nothing
 def featureWord(email_list, dataset):
 	global feature_list # Edit the global varabile
+	index_vocab = vocabulary_list.keys()
 	print "		-> Creating Feature Set"
 	print "		-> Dataset: " + dataset
 	startTime = time.time() # Starts Timer
 	feature_list = [[0 for x in range(len(vocabulary_list))] for y in range(4000)]
-	for e, email in enumerate(email_list):
-		word_set = getSingleDataSet(email) 
-		for small in word_set:
-			if (small in vocabulary_list):
-				keys = vocabulary_list.keys().index(small)
-				feature_list[e][keys] = 1
+	statement = True
+	counter = 0
+	while (counter < len(email_list)):
+		word_set = getSingleDataSet(email_list[counter])
+		for i, word in enumerate(index_vocab):
+			if(word in word_set):
+				keys = index_vocab.index(word)
+				feature_list[counter][keys] = 1
+		counter += 1
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
 	print "			-> There are " + str(len(feature_list)) + " words in the feature list, and " + str(len(feature_list[1])) + " elements in each."
 	return
@@ -243,7 +250,7 @@ if __name__ == '__main__':
 		createVector()
 		# Run Pegasos
 		lambd = math.pow(2,-5)
-		weight = pegasos_svm_train(train_vector_list, all_data, lambd, 20)
+		weight = pegasos_svm_train(train_vector_list, all_data, lambd, 1)
 		pegasos_svm_test(weight, validate_vector_list, validation_data)
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:

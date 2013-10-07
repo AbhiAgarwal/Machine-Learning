@@ -136,7 +136,7 @@ def multipegasos(data, lambd, classificationNum, dataset, iterations):
 
 # Tests the Pegasos SVM Algorithm to see how well the data did
 # @Returns how many times it misses, but prints out the final result
-def multiclass_pegasos_test(data, weights, classificationNum):
+def multiclass_pegasos_test(data, weights, classificationNum, dataset):
 	print "heh"
 
 # @Main function

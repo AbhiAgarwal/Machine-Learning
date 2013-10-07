@@ -219,7 +219,7 @@ def pegasos_svm_test(weight, feature, data):
 if __name__ == '__main__':
 	if "-run" in sys.argv:
 		print "Calling: " + str(sys.argv) + " arguments."
-		print "-> Starting Process"
+		print "-> Starting Training Process"
 		# Initialize
 		startTime = time.time() # Starts Timer
 		getData() # Gets data from all the files
@@ -239,9 +239,14 @@ if __name__ == '__main__':
 			iteration = int(float(sys.argv[key]))
 		weight = pegasos_svm_train(train_vector_list, all_data, lambd, iteration)
 		pegasos_svm_test(weight, validate_vector_list, validation_data)
-		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
+		print "-> Whole Training Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:
-		print "heh"
+		print "Calling: " + str(sys.argv) + " arguments."
+		print "-> Starting Test Process"
+		# Initialize
+		startTime = time.time() # Starts Timer
+		# PUT IN TEST STUFF
+		print "-> Whole Test Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	else:
 		print "	-run: to run training"
 		print "	-test: to run testing"

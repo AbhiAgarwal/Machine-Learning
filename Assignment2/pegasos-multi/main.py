@@ -1,4 +1,4 @@
-import sys, time, math
+import sys, time, math, operator
 from copy import deepcopy
 train_vectors = [] # list of validation & training vectors
 test_vectors = [] # list of test vectors
@@ -25,7 +25,10 @@ def getData():
 				temp[x] = vec_math
 			else:
 				pass
-		train_vectors.append(deepcopy(temp))
+		toAppend = [0 for i in range(0, 2)]
+		toAppend[0] = int(lineOne[0]) # takes '3', '[-1, 1, 1, -1, 0]' to Append
+		toAppend[1] = deepcopy(temp)
+		train_vectors.append(toAppend)
 	print "		-> Got Training & Validation Data"
 	temp = []
 	print "		-> Starting to get Test Data"
@@ -39,6 +42,7 @@ def getData():
 				temp[x] = vec_math
 			else:
 				pass
+		test_vectors.append(int(lineOne[0]))
 		test_vectors.append((deepcopy(temp)))
 	print "			-> Got Test Data"
 	print "			-> There are " + str(len(train_vectors)) + " vectors for the Validation Set"
@@ -136,8 +140,25 @@ def multipegasos(data, lambd, classificationNum, dataset, iterations):
 
 # Tests the Pegasos SVM Algorithm to see how well the data did
 # @Returns how many times it misses, but prints out the final result
-def multiclass_pegasos_test(data, weights, classificationNum, dataset):
-	print "heh"
+def multipegasostest(data, weights, classifications, dataset):
+	print "		-> Starting to parse data for Pegasos Tester Algorithm"
+	print "		-> Dataset: " + str(dataset)
+	startTime = time.time() # Starts Timer
+	variable_x, vector_x, errors = 0
+	hand = []
+	for i, val in enumerate(data):
+		variable_x = val[0] # Placeholder for x when x is [x, [0,1,-1,1,0...]]
+		vector_x = val[1] # Vector [variable_x, [vector_x]]
+		hand = [0 for i in range(0, len(weights))] # initialize hand
+		for x, weightOne in enumerate(weights):
+			hand[x] = dotFunction(weightOne, vector_x)
+		max_x, max_y = max((enumerate(hand)), key = operator.itemgetter(1))
+		if((int(classifications[max_x])) != (int(variable_x))):
+			errors += 1
+	notRight = (float(errors) / (float(len(data))))
+	print "			-> Error: " + str(errors) + ", out of: " + str(len(data)) + ". Has " + str(notRight) + "% errors"
+	print "			-> Took " + str(time.time() - startTime) + " seconds"	
+	return errors
 
 # @Main function
 # @Returns nothing
@@ -147,28 +168,45 @@ if __name__ == '__main__':
 		print "Calling: " + str(sys.argv) + " arguments."
 		print "-> Starting Training & Validation Process"
 		startTime = time.time() # Starts Timer
-		# Start Process for user input
+		# Gets data of mnist_test & mnist_train
 		getData()
+		# Start Process for user input
+		# Get Lambda
 		lambd = math.pow(2, -3)
 		if "-lambd" in sys.argv:
 			key = sys.argv.index('-lambd') + 1
 			lambd = int(math.pow(2, float(sys.argv[key])))
+		# Get the classification index you want
+		classification_index = []
+		classification_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+		if "-classification" in sys.argv:
+			key = sys.argv.index('-classification') + 1
+			classification_index = list(sys.argv[key])
+			classification_index = map(int, classification_index)
+			if (len(classification_index) != 10):
+				classification_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+				print "		-> *** Classification Size Error: set to default"
+		# Get number of Iterations
 		iteration = 5
 		if "-iteration" in sys.argv:
 			key = sys.argv.index('-iteration') + 1
 			iteration = int(float(sys.argv[key]))
 		# Runs Multi Pegasos
 		# Calculate 10 weights
-		weight0 = multipegasos(train_vectors, lambd, 0, "Training Data", iteration)
-		weight1 = multipegasos(train_vectors, lambd, 1, "Training Data", iteration)
-		weight2 = multipegasos(train_vectors, lambd, 2, "Training Data", iteration)
-		weight3 = multipegasos(train_vectors, lambd, 3, "Training Data", iteration)
-		weight4 = multipegasos(train_vectors, lambd, 4, "Training Data", iteration)
-		weight5 = multipegasos(train_vectors, lambd, 5, "Training Data", iteration)
-		weight6 = multipegasos(train_vectors, lambd, 6, "Training Data", iteration)
-		weight7 = multipegasos(train_vectors, lambd, 7, "Training Data", iteration)
-		weight8 = multipegasos(train_vectors, lambd, 8, "Training Data", iteration)
-		weight9 = multipegasos(train_vectors, lambd, 9, "Training Data", iteration)
+		weight0 = multipegasos(train_vectors, lambd, classification_index[0], "Training Data", iteration)
+		weight1 = multipegasos(train_vectors, lambd, classification_index[1], "Training Data", iteration)
+		weight2 = multipegasos(train_vectors, lambd, classification_index[2], "Training Data", iteration)
+		weight3 = multipegasos(train_vectors, lambd, classification_index[3], "Training Data", iteration)
+		weight4 = multipegasos(train_vectors, lambd, classification_index[4], "Training Data", iteration)
+		weight5 = multipegasos(train_vectors, lambd, classification_index[5], "Training Data", iteration)
+		weight6 = multipegasos(train_vectors, lambd, classification_index[6], "Training Data", iteration)
+		weight7 = multipegasos(train_vectors, lambd, classification_index[7], "Training Data", iteration)
+		weight8 = multipegasos(train_vectors, lambd, classification_index[8], "Training Data", iteration)
+		weight9 = multipegasos(train_vectors, lambd, classification_index[9], "Training Data", iteration)
+		# Form all Weights
+		# into Array, and sets the classification
+		allWeights = (weight0, weight1, weight2, weight3, weight4, weight5, weight6, weight7, weight8, weight9)
+		errors = multipegasostest(test_vectors, allWeights, classification, "Test Data")
 		# finishing off the Pegasos
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:
@@ -180,3 +218,4 @@ if __name__ == '__main__':
 		print "	-all: to show all function"
 		print " -lambd: to input lambda (default: -3)"
 		print " -iteration: to input iterations to make (default: 5)"
+		print " -classification: to enter classifications, enter as 0123456789 (joint), (default: 0123456789)"

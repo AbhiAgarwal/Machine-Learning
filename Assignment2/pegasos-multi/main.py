@@ -289,6 +289,7 @@ if __name__ == '__main__':
 		final_error_avg = ((float(half_error_avg)) / (float(divide)))
 		print "		-> Average errors in classification " + str(error_avg)
 		print "		-> Average errors in validating data " + str(final_error_avg)
+		# Error comes
 		# finishing off the Pegasos
 		print "		-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	else:

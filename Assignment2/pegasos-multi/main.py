@@ -1,4 +1,4 @@
-import sys, time, math, operator
+import sys, time, math, operator, itertools
 from copy import deepcopy
 train_vectors = [] # list of validation & training vectors
 test_vectors = [] # list of test vectors
@@ -178,7 +178,6 @@ def multipegasostest(data, weights, classifications, dataset):
 	errors = 0
 	hand = []
 	for i, val in enumerate(data):
-		print val
 		variable_x = val[0] # Placeholder for x when x is [x, [0,1,-1,1,0...]]
 		vector_x = val[1] # Vector [variable_x, [vector_x]]
 		hand = [0 for i in range(0, len(weights))] # initialize hand
@@ -195,34 +194,40 @@ def multipegasostest(data, weights, classifications, dataset):
 # @Main function
 # @Returns nothing
 if __name__ == '__main__':
-	if "-run" in sys.argv:
-		# Initializes the program
-		print "Calling: " + str(sys.argv) + " arguments."
-		print "-> Starting Training & Validation Process"
-		startTime = time.time() # Starts Timer
-		# Gets data of mnist_test & mnist_train
-		getData()
-		# Start Process for user input
-		# Get Lambda
-		lambd = math.pow(2, -3)
-		if "-lambd" in sys.argv:
-			key = sys.argv.index('-lambd') + 1
-			lambd = int(math.pow(2, float(sys.argv[key])))
-		# Get the classification index you want
-		classification_index = []
-		classification_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-		if "-classification" in sys.argv:
-			key = sys.argv.index('-classification') + 1
-			classification_index = list(sys.argv[key])
-			classification_index = map(int, classification_index)
-			if (len(classification_index) != 10):
-				classification_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-				print "		-> *** Classification Size Error: set to default"
+	# Initializes the program
+	print "Calling: " + str(sys.argv) + " arguments."
+	# Starts Timer
+	startTime = time.time()
+	# Start Process for user input
+	# Gets all common values for each, and sets them
+	# Get Lambda
+	lambd = math.pow(2, -3)
+	if "-lambd" in sys.argv:
+		key = sys.argv.index('-lambd') + 1
+		lambd = int(math.pow(2, float(sys.argv[key])))
+	# Get the classification index you want
+	classification_index = []
+	classification_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+	if "-classification" in sys.argv:
+		key = sys.argv.index('-classification') + 1
+		classification_index = list(sys.argv[key])
+		classification_index = map(int, classification_index)
+		if (len(classification_index) != 10):
+			classification_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+			print "		-> *** Classification Size Error: set to default"
 		# Get number of Iterations
-		iteration = 5
-		if "-iteration" in sys.argv:
-			key = sys.argv.index('-iteration') + 1
-			iteration = int(float(sys.argv[key]))
+	iteration = 5
+	if "-iteration" in sys.argv:
+		key = sys.argv.index('-iteration') + 1
+		iteration = int(float(sys.argv[key]))
+	divide = 5
+	if "-divide" in sys.argv:
+		key = sys.argv.index('-divide') + 1
+		divide = int(float(sys.argv[key]))
+	# Gets data of mnist_test & mnist_train
+	getData()
+	if "-run" in sys.argv:
+		print "-> Starting Training & Validation Process"
 		# Runs Multi Pegasos
 		# Calculate 10 weights
 		weight0 = multipegasos(train_vectors, lambd, classification_index[0], "Training Data", iteration)
@@ -241,13 +246,56 @@ if __name__ == '__main__':
 		errors = multipegasostest(test_vectors, allWeights, classification_index, "Test Data")
 		# finishing off the Pegasos
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
-	elif "-test" in sys.argv:
+	elif "-cross" in sys.argv:
 		print "Calling: " + str(sys.argv) + " arguments."
-		print "-> Starting Test Process"
+		print "-> Starting Cross Validation Process"
+		startTime = time.time() # Starts Timer
+		errors = 0
+		print "		-> Chosen to divided data into " + str(divide) + " blocks."
+		itemsPerDivision = ((len(train_vectors)) / (divide))
+		divide_data = [[] for i in range(0, divide)] #splits into divide
+		divide_process_begin = 0
+		for x in range(0, divide):
+			final_divide_process = itemsPerDivision + divide_process_begin
+			divide_data[x - 1] = train_vectors[divide_process_begin:final_divide_process]
+			divide_process_begin = final_divide_process # traversal in blocks
+		print "		-> Split into " + str(divide) + " blocks of " + str(itemsPerDivision) + " each!"
+		data_x = []
+		for x in range(0, divide):
+			del data_x[:]
+			for y in range(0, divide):
+				if y != x:
+					data_x = list(itertools.chain(data_x, divide_data[y]))
+				else:
+					pass
+			pid = (x+1)
+			print "			-> At process: " + str(pid)
+			weight0 = multipegasos(data_x, lambd, classification_index[0], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight1 = multipegasos(data_x, lambd, classification_index[1], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight2 = multipegasos(data_x, lambd, classification_index[2], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight3 = multipegasos(data_x, lambd, classification_index[3], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight4 = multipegasos(data_x, lambd, classification_index[4], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight5 = multipegasos(data_x, lambd, classification_index[5], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight6 = multipegasos(data_x, lambd, classification_index[6], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight7 = multipegasos(data_x, lambd, classification_index[7], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight8 = multipegasos(data_x, lambd, classification_index[8], str("Training Data: Process ID: " + str(pid)), iteration)
+			weight9 = multipegasos(data_x, lambd, classification_index[9], str("Training Data: Process ID: " + str(pid)), iteration)
+			# Form all Weights
+			# into Array, and sets the classification
+			allWeights = (weight0, weight1, weight2, weight3, weight4, weight5, weight6, weight7, weight8, weight9)
+			errors += multipegasostest(divide_data[x], allWeights, classification_index, "Test Data")
+		error_avg = ((float(errors))/(float(divide)))
+		half_error_avg = (float(errors) / float(len(train_vectors)))
+		final_error_avg = ((float(half_error_avg)) / (float(divide)))
+		print "		-> Average errors in classification " + str(error_avg)
+		print "		-> Average errors in validating data " + str(final_error_avg)
+		# finishing off the Pegasos
+		print "		-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	else:
 		print "	-run: to run training"
-		print "	-test: to run testing"
-		print "	-all: to show all function"
-		print "	-lambd: to input lambda (default: -3)"
-		print "	-iteration: to input iterations to make (default: 5)"
-		print "	-classification: to enter classifications, enter as 0123456789 (joint), (default: 0123456789)"
+		print "	-run -lambd: to input lambda (default: -3)"
+		print "	-run -iteration: to input iterations to make (default: 5)"
+		print "	-run -classification: to enter classifications, enter as 0123456789 (joint), (default: 0123456789)"
+		print "	-cross: to run the cross validation algorithm"
+		print "	-cross -divide: to set how mnay divisions of the data you want "
+		print "	-all: to show all function output (each math function as well)"

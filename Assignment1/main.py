@@ -1,3 +1,10 @@
+'''
+The Data has been removed:
+Against class policy
+If you'd like to see the data with the work - 
+contact me (Twitter @AbhiAgarwal)
+'''
+
 import copy # copying dict/array function
 from numpy import dot # dot function
 import time # time (to measure)
@@ -35,8 +42,8 @@ def getData():
 	global training_data # Edit the global varabile
 	global validation_data # Edit the global varabile
 	global test_data # Edit the global varabile
-	train = open('./data/spam_train.txt', 'r') # Declaration of files
-	test = open('./data/spam_test.txt', 'r') # Declaration of files
+	train = open('', 'r') # Declaration of files
+	test = open('', 'r') # Declaration of files
 	n = 0 # Counter for 0-4000, 4000-5000
 	for data in train: # Getting data from the files
 		if data:
@@ -325,14 +332,9 @@ if __name__ == '__main__':
 	rankWords() # Ranks Words by how many times they appear
 	featureWord(training_data) # Transform into features, input vectors
 	print feature_list.__len__()
-	#perceptron_train(training_data, feature_list, False, 14) # Runs main perceptron algorithm
-	# rankWordsValidationSet() # Puts words onto the vocabulary & weight set
-	# featureWordValidation(validation_data) # Puts Feature onto Validation Set
-	#perceptron_test(weight_list, validation_data, feature_list_validation) # Tests before doing training
-	#perceptron_train(validation_data, feature_list_validation, False, 14) # Trains for validation set
-	#perceptron_test(weight_list, validation_data, feature_list_validation) # Tests again to see improvement
-	#weightAnalysis(weight_list) # Analyising the weight both Low and High
-	#perceptron_train(validation_data, feature_list_validation, True, 14)
-	#rankWordsTestSet() - To understand the proper %
-	#featureWordTest(test_data) - To understand the proper %
-	#perceptron_test(weight_list, test_data, feature_list_test) # Perceptron Test
+	perceptron_train(training_data, feature_list, False, 14) # Runs main perceptron algorithm
+	rankWordsValidationSet() # Puts words onto the vocabulary & weight set
+	featureWordValidation(validation_data) # Puts Feature onto Validation Set
+	perceptron_test(weight_list, validation_data, feature_list_validation) # Tests before doing training
+	weightAnalysis(weight_list) # Analyising the weight both Low and High
+	perceptron_test(weight_list, test_data, feature_list_test) # Perceptron Test

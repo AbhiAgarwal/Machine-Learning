@@ -1,3 +1,10 @@
+'''
+The Data has been removed:
+Against class policy
+If you'd like to see the data with the work - 
+contact me (Twitter @AbhiAgarwal)
+'''
+
 import sys, time, math, operator, itertools
 from copy import deepcopy
 train_vectors = [] # list of validation & training vectors
@@ -10,10 +17,10 @@ training_vectors = [] # validation vector
 def getData():
 	temp = []
 	global train_vectors, test_vectors # Editing the global varabile
-	print "		-> Getting Test, Validation & Training Data from MNIST"
+	print "		-> Getting Test, Validation & Training Data from {DATA SOURCE}"
 	startTime = time.time() # Starts Timer
-	train = open('./data/mnist_train.txt', 'r') # Declaration of files
-	test = open('./data/mnist_test.txt', 'r') # Declaration of files
+	train = open('', 'r') # Declaration of files
+	test = open('', 'r') # Declaration of files
 	print "		-> Starting to get Training & Validation Data"
 	for i, sent in enumerate(train):
 		del temp[:] # to refresh the queue
@@ -225,7 +232,6 @@ if __name__ == '__main__':
 	if "-divide" in sys.argv:
 		key = sys.argv.index('-divide') + 1
 		divide = int(float(sys.argv[key]))
-	# Gets data of mnist_test & mnist_train
 	getData()
 	if "-run" in sys.argv:
 		print "-> Starting Training & Validation Process"
@@ -288,7 +294,7 @@ if __name__ == '__main__':
 		error_avg = ((float(errors))/(float(divide)))
 		half_error_avg = (float(errors) / float(len(train_vectors)))
 		final_error_avg = ((float(half_error_avg)) / (float(divide)))
-		print "		-> Average errors in classification is " + str(error_avg) + ", " + str(100*(error_avg/1000))
+		print "		-> Average errors in classification is " + str(error_avg) + ", " + str(100 * (error_avg/1000))
 		print "		-> Average errors in validating data is " + str(final_error_avg * 100) + "%."
 		# Error comes out now
 		# finishing off the Pegasos

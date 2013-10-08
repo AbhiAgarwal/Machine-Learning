@@ -1,3 +1,10 @@
+'''
+The Data has been removed:
+Against class policy
+If you'd like to see the data with the work - 
+contact me (Twitter @AbhiAgarwal)
+'''
+
 import math, time, sys
 all_data = [] # Training + Validation Data
 training_data = [] # Training Data
@@ -15,10 +22,10 @@ index_vocab = []
 # @Returns nothing
 def getData():
 	global training_data, validation_data, test_data # Editing the global varabile
-	print "		-> Getting Test, Validation & Training Data"
+	print "		-> Getting Test, Validation & Training Data from {DATA SOURCE}"
 	startTime = time.time() # Starts Timer
-	train = open('./data/spam_train.txt', 'r') # Declaration of files
-	test = open('./data/spam_test.txt', 'r') # Declaration of files
+	train = open('', 'r') # Declaration of files
+	test = open('', 'r') # Declaration of files
 	for index, data in enumerate(train): # Getting data from the files
 		if data:
 			all_data.append(data)
@@ -77,7 +84,6 @@ def rankWords(data, dataset):
 	return
 
 # You've to go through all the vocab and tick 1 or 0 if its there
-# UPDATE: TOO SLOW
 # @Returns nothing
 def featureWord(email_list, dataset):
 	global feature_list # Edit the global varabile

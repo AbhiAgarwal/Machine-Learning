@@ -42,8 +42,10 @@ def getData():
 				temp[x] = vec_math
 			else:
 				pass
-		test_vectors.append(int(lineOne[0]))
-		test_vectors.append((deepcopy(temp)))
+		toAppend = [0 for i in range(0, 2)]
+		toAppend[0] = int(lineOne[0]) # takes '3', '[-1, 1, 1, -1, 0]' to Append
+		toAppend[1] = deepcopy(temp)
+		test_vectors.append(toAppend)
 	print "			-> Got Test Data"
 	print "			-> There are " + str(len(train_vectors)) + " vectors for the Validation Set"
 	print "			-> There are " + str(len(test_vectors)) + " vectors for the Test Set"
@@ -110,11 +112,40 @@ def evaluateFunc(weight, lambd, two):
 def pegasos_svm_train(data, lambd, iteration):
 	print "		-> Starting to Train Pegasos Algorithm"
 	startTime = time.time() # Starts Timer
+	base_0 = data[0]
+	base_1 = base_0[1]
+	iterations = 1
+	weights_pegasos = [0 for i in range(0, len(base_1))]
+	u = [0 for i in range(0, len(base_1))]
+	t = 0
+	nt = 0
+	for i in range(0, iteration): # 20 passes through data
+		overone = 0 # > 1
+		underone = 0 # < 1
+		evalution = 0 # eval
+		for index, vector in enumerate(data): # Traversal through the Feature List
+			yj = vector[0]
+			vec = vector[1]
+			t += 1
+			nt = ((float(1))/(t * lambd))
+			if((yj * dotFunction(weights_pegasos, vec)) < 1):
+				u = vectorAdd((vectorMult((1 - (nt * lambd)), weights_pegasos)), (vectorMult((nt * yj), vec)))
+				underone += 1
+			else:
+				u = vectorMult((1 - (nt * lambd)), (weights_pegasos))
+				overone += 1
+			val = min(1, ((1 / (math.sqrt(lambd))) / (vectorMagnitude(u))))
+			tempo = vectorMult(val, u)
+			weights_pegasos = tempo[:]
+			evalution += max(0, (1 - (nt * dotFunction(weights_pegasos, vec))))
+			del u[:] #reset
+		obj_val = evaluateFunc(weights_pegasos, lambd, evalution)
+		print "			-> Lower Than One: " + str(underone) + " Over One: " + str(overone)
+		print "			-> Number: " + str(iterations) + " Value: " + str(obj_val)
+		iterations += 1
+	print "			-> Took " + str(time.time() - startTime) + " seconds"
+	return weights_pegasos
 
-
-	# FILL IN HERE NOW
-
-	print iteration
 	sys.exit(1)
 	print "			-> Pegasos SVM Took " + str(time.time() - startTime) + " seconds"
 
@@ -144,9 +175,10 @@ def multipegasostest(data, weights, classifications, dataset):
 	print "		-> Starting to parse data for Pegasos Tester Algorithm"
 	print "		-> Dataset: " + str(dataset)
 	startTime = time.time() # Starts Timer
-	variable_x, vector_x, errors = 0
+	errors = 0
 	hand = []
 	for i, val in enumerate(data):
+		print val
 		variable_x = val[0] # Placeholder for x when x is [x, [0,1,-1,1,0...]]
 		vector_x = val[1] # Vector [variable_x, [vector_x]]
 		hand = [0 for i in range(0, len(weights))] # initialize hand
@@ -206,7 +238,7 @@ if __name__ == '__main__':
 		# Form all Weights
 		# into Array, and sets the classification
 		allWeights = (weight0, weight1, weight2, weight3, weight4, weight5, weight6, weight7, weight8, weight9)
-		errors = multipegasostest(test_vectors, allWeights, classification, "Test Data")
+		errors = multipegasostest(test_vectors, allWeights, classification_index, "Test Data")
 		# finishing off the Pegasos
 		print "-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:
@@ -216,6 +248,6 @@ if __name__ == '__main__':
 		print "	-run: to run training"
 		print "	-test: to run testing"
 		print "	-all: to show all function"
-		print " -lambd: to input lambda (default: -3)"
-		print " -iteration: to input iterations to make (default: 5)"
-		print " -classification: to enter classifications, enter as 0123456789 (joint), (default: 0123456789)"
+		print "	-lambd: to input lambda (default: -3)"
+		print "	-iteration: to input iterations to make (default: 5)"
+		print "	-classification: to enter classifications, enter as 0123456789 (joint), (default: 0123456789)"

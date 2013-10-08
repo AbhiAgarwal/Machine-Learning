@@ -152,12 +152,18 @@ def evaluateFunc(weight, lambd, two):
 	obj = ((lambd / 2) * math.pow(vectorMagnitude(weight), 2)) + two
 	return obj
 
+def hingeloss(x, y):
+	return (float(1) / (float(x))) * y
+
 # @Trains using Support Vector Machine Algorithm
 # @Returns final classification vector
 def pegasos_svm_train(vector, data, lambd, iteration):
 	global weights_pegasos
 	print "		-> Training using the Pegasos Algorithm"
 	startTime = time.time() # Starts Timer
+	obj_avg = 0
+	hinge_avg = 0
+	hing_avg_answer = 0
 	iterations = 1 # Num of passes through data
 	weights_pegasos = [0 for i in range(0, len(vector))] # Initilize the Weight
 	u = [0 for i in range(0, len(vector))] # Initlize the "u"
@@ -183,10 +189,15 @@ def pegasos_svm_train(vector, data, lambd, iteration):
 			evalution += max(0, (1 - (nt * dotFunction(weights_pegasos, vec))))
 			del u[:] #reset
 		obj_val = evaluateFunc(weights_pegasos, lambd, evalution)
+		obj_avg += obj_val
+		hinge_avg = hingeloss(len(vec), evalution)
 		# Obj_val is to plot (f(wt))
+		print "			-> Hinge Loss for iteration number " + str(iterations) + " is: " + str(hinge_avg)
 		print "			-> Lower Than One: " + str(underone) + " Over One: " + str(overone)
 		print "			-> Number: " + str(iterations) + " Value: " + str(obj_val)
+		hing_avg_answer += hinge_avg
 		iterations += 1
+	print "			-> Average Hinge Loss: " + str((hing_avg_answer)/(iteration))
 	print "			-> Took " + str(time.time() - startTime) + " seconds"
 	return weights_pegasos
 
@@ -230,23 +241,72 @@ if __name__ == '__main__':
 		featureWord(all_data, "Training & Validation Data") # Transform into features, input vectors
 		createVector()
 		# Run Pegasos
-		lambd = math.pow(2, -5)
+		lambd = float(math.pow(2, -3))
 		if "-lambd" in sys.argv:
 			key = sys.argv.index('-lambd') + 1
-			lambd = int(math.pow(2, float(sys.argv[key])))
+			lambd = float(math.pow(2, float(sys.argv[key])))
+			print "		-> Lambda set to: " + str(lambd)
 		iteration = 20
 		if "-iteration" in sys.argv:
 			key = sys.argv.index('-iteration') + 1
 			iteration = int(float(sys.argv[key]))
+
 		weight = pegasos_svm_train(train_vector_list, all_data, lambd, iteration)
+		print "	-> Test Error:"
 		pegasos_svm_test(weight, validate_vector_list, validation_data)
+		print "	-> Validation Error:"
+		pegasos_svm_test(weight, train_vector_list, feature_list)
+		'''
+		# To get 2^-9 -> 2^1 for Hinge Loss Average	
+		weight9 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -9)), iteration)
+		pegasos_svm_test(weight9, validate_vector_list, validation_data)
+		weight8 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -8)), iteration)
+		pegasos_svm_test(weight8, validate_vector_list, validation_data)
+		weight7 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -7)), iteration)
+		pegasos_svm_test(weight7, validate_vector_list, validation_data)
+		weight6 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -6)), iteration)
+		pegasos_svm_test(weight6, validate_vector_list, validation_data)
+		weight5 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -5)), iteration)
+		pegasos_svm_test(weight5, validate_vector_list, validation_data)
+		weight4 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -4)), iteration)
+		pegasos_svm_test(weight4, validate_vector_list, validation_data)
+		weight3 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -3)), iteration)
+		pegasos_svm_test(weight3, validate_vector_list, validation_data)
+		weight2 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -2)), iteration)
+		pegasos_svm_test(weight2, validate_vector_list, validation_data)
+		weight1 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, -1)), iteration)
+		pegasos_svm_test(weight1, validate_vector_list, validation_data)
+		weight0 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, 0)), iteration)
+		pegasos_svm_test(weight0, validate_vector_list, validation_data)
+		weight10 = pegasos_svm_train(train_vector_list, all_data, (math.pow(2, 1)), iteration)
+		pegasos_svm_test(weight10, validate_vector_list, validation_data)
+		'''
 		print "-> Whole Training Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	elif "-test" in sys.argv:
 		print "Calling: " + str(sys.argv) + " arguments."
 		print "-> Starting Test Process"
 		# Initialize
 		startTime = time.time() # Starts Timer
-		# PUT IN TEST STUFF
+		getData() # Gets data from all the files
+		rankWords(training_data, "Training Data") # Ranks Words by how many times they appear
+		rankWords(validation_data, "Validation Data") # Ranks Words by how many times they appear
+		feature_list = [[0 for x in range(len(vocabulary_list))] for y in range(5000)]
+		featureWord(all_data, "Training & Validation Data") # Transform into features, input vectors
+		# Run Pegasos
+		lambd = float(math.pow(2, -3))
+		if "-lambd" in sys.argv:
+			key = sys.argv.index('-lambd') + 1
+			lambd = float(math.pow(2, float(sys.argv[key])))
+			print "		-> Lambda set to: " + str(lambd)
+		iteration = 20
+		if "-iteration" in sys.argv:
+			key = sys.argv.index('-iteration') + 1
+			iteration = int(float(sys.argv[key]))
+		weight = pegasos_svm_train(feature_list, all_data, lambd, iteration)
+		print "	-> Test Error:"
+		pegasos_svm_test(weight, test_data, test)
+		print "	-> Validation Error:"
+		pegasos_svm_test(weight, train_vector_list, feature_list)
 		print "-> Whole Test Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	else:
 		print "	-run: to run training"

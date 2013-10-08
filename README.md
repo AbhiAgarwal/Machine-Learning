@@ -15,5 +15,3 @@ Assignments from Course in Machine Learning
        
     - the Pegasos Algorithm,
     - the Pegasos Algorithm for multiple-classes
-
-    Also, using libSVM to make predictions & finding cross-validation errors.

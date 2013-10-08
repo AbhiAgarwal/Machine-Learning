@@ -1,7 +1,3 @@
-Result for Pegasos Algorithm
-
-a) 
-
 Result for Pegasos Multi-Class Algorithm
 
 a) I was able to get the data from the files mnist_train.txt, mnist_test.txt, and transform them into feature vectors.

@@ -187,7 +187,7 @@ def multipegasostest(data, weights, classifications, dataset):
 		if((int(classifications[max_x])) != (int(variable_x))):
 			errors += 1
 	notRight = (float(errors) / (float(len(data))))
-	print "			-> Error: " + str(errors) + ", out of: " + str(len(data)) + ". Has " + str(notRight) + "% errors"
+	print "			-> Error: " + str(errors) + ", out of: " + str(len(data)) + ". Has " + str(notRight * 100) + "% errors"
 	print "			-> Took " + str(time.time() - startTime) + " seconds"	
 	return errors
 
@@ -201,10 +201,11 @@ if __name__ == '__main__':
 	# Start Process for user input
 	# Gets all common values for each, and sets them
 	# Get Lambda
-	lambd = math.pow(2, -3)
+	lambd = float(math.pow(2, -3))
 	if "-lambd" in sys.argv:
 		key = sys.argv.index('-lambd') + 1
-		lambd = int(math.pow(2, float(sys.argv[key])))
+		lambd = float(math.pow(2, float(sys.argv[key])))
+		print "		-> Lambda set to: " + str(lambd)
 	# Get the classification index you want
 	classification_index = []
 	classification_index = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -287,16 +288,22 @@ if __name__ == '__main__':
 		error_avg = ((float(errors))/(float(divide)))
 		half_error_avg = (float(errors) / float(len(train_vectors)))
 		final_error_avg = ((float(half_error_avg)) / (float(divide)))
-		print "		-> Average errors in classification " + str(error_avg)
-		print "		-> Average errors in validating data " + str(final_error_avg)
-		# Error comes
+		print "		-> Average errors in classification is " + str(error_avg) + ", " + str(100*(error_avg/1000))
+		print "		-> Average errors in validating data is " + str(final_error_avg * 100) + "%."
+		# Error comes out now
 		# finishing off the Pegasos
 		print "		-> Whole Algorithm: Took " + str(time.time() - startTime) + " seconds"
 	else:
+		print "	Run:"
 		print "	-run: to run training"
 		print "	-run -lambd: to input lambda (default: -3)"
 		print "	-run -iteration: to input iterations to make (default: 5)"
 		print "	-run -classification: to enter classifications, enter as 0123456789 (joint), (default: 0123456789)"
+		print "	-run -all: to show all function output (each math function as well)"
+		print "	Cross:"
 		print "	-cross: to run the cross validation algorithm"
-		print "	-cross -divide: to set how mnay divisions of the data you want "
-		print "	-all: to show all function output (each math function as well)"
+		print "	-cross -divide: to set how mnay divisions of the data you want"
+		print "	-cross -lambd: to input lambda (default: -3)"
+		print "	-cross -iteration: to input iterations to make (default: 5)"
+		print "	-cross -classification: to enter classifications, enter as 0123456789 (joint), (default: 0123456789)"
+		print "	-cross -all: to show all function output (each math function as well)"

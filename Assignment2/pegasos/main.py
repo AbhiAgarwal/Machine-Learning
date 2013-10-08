@@ -183,6 +183,7 @@ def pegasos_svm_train(vector, data, lambd, iteration):
 			evalution += max(0, (1 - (nt * dotFunction(weights_pegasos, vec))))
 			del u[:] #reset
 		obj_val = evaluateFunc(weights_pegasos, lambd, evalution)
+		# Obj_val is to plot (f(wt))
 		print "			-> Lower Than One: " + str(underone) + " Over One: " + str(overone)
 		print "			-> Number: " + str(iterations) + " Value: " + str(obj_val)
 		iterations += 1
@@ -233,7 +234,7 @@ if __name__ == '__main__':
 		if "-lambd" in sys.argv:
 			key = sys.argv.index('-lambd') + 1
 			lambd = int(math.pow(2, float(sys.argv[key])))
-		iteration = 5
+		iteration = 20
 		if "-iteration" in sys.argv:
 			key = sys.argv.index('-iteration') + 1
 			iteration = int(float(sys.argv[key]))

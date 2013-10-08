@@ -13,3 +13,5 @@ Assignments from NYU Course 480 - Machine Learning
        
     - the Pegasos Algorithm,
     - the Pegasos Algorithm for multiple-classes
+
+    Also, using libSVM to make predictions & finding cross-validation errors.
